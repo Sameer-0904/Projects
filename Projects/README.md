@@ -5,7 +5,7 @@ An elegant and responsive **Streamlit web application** that uses a **machine le
 ---
 
 ## 🚀 Live Demo
-🌐 [Try the App on Streamlit](https://diabetespredictivesystem.streamlit.app/)
+🌐 [Try the App on Streamlit](https://predict-diabetes-risk.streamlit.app/)
 
 ---
 
