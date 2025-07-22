@@ -85,7 +85,7 @@ def diabetes_prediction(input_data):
 
 # --- Main UI ---
 def main():
-    st.markdown("<h2 style='text-align: left; margin-bottom: 0;'>Diabetes Risk Assessment</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: left; margin-bottom: 0;'>🩺Diabetes Risk Predictor</h2>", unsafe_allow_html=True)
     st.markdown("<span style='color:#666;font-size:1.12rem'>A modern, ML-powered diabetes screening tool</span>", unsafe_allow_html=True)
     st.write("")
 
@@ -136,7 +136,7 @@ def main():
             st.markdown('<div class="result-card {}">'.format('result-bad' if result == 1 else 'result-ok' if result == 0 else ''),
                         unsafe_allow_html=True)
             if result == 0:
-                st.markdown(f"<span style='font-size:2rem'>✅</span><br>{message}", unsafe_allow_html=True)
+                st.markdown(f"{message}", unsafe_allow_html=True)
                 st.info("Tips: Keep up with healthy eating, regular exercise, and annual checkups.")
             elif result == 1:
                 st.markdown(f"<span style='font-size:2rem'>🚨</span><br>{message}", unsafe_allow_html=True)
