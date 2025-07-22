@@ -1,408 +1,162 @@
 import numpy as np
 import pickle
 import streamlit as st
-import warnings 
+import warnings
 warnings.filterwarnings('ignore')
 
-# Page Configuration
+# --- General Config ---
 st.set_page_config(
-    page_title="Diabetes Prediction App",
+    page_title="Diabetes Risk Assessment",
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Beautiful Styling
+# --- Custom CSS for Material Design Inspired Look ---
 st.markdown("""
 <style>
-    .main-header {
-        text-align: center;
-        color: #2E86AB;
-        font-size: 3.5rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-    .sub-header {
-        text-align: center;
-        color: #666;
-        font-size: 1.3rem;
-        margin-bottom: 2rem;
-        font-style: italic;
-    }
-    .developer-info {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        color: white;
-        text-align: center;
-        margin: 2rem 0;
-    }
-    .prediction-box {
-        padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        margin: 2rem 0;
-        font-size: 1.8rem;
-        font-weight: bold;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    }
-    .positive {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-        border-left: 5px solid #ff6b6b;
-        color: #d63031;
-    }
-    .negative {
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        border-left: 5px solid #00b894;
-        color: #00b894;
-    }
-    .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        padding: 0.8rem 3rem;
-        font-size: 1.2rem;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-    .stButton > button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-    }
-    .info-card {
-        background: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-left: 4px solid #667eea;
-        margin: 1rem 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .contact-info {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    margin: 1rem 0;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+body { background: #f5f7fa !important; }
+h1, h2, h3, h4, h5 { color: #28446e; }
+.material-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(80,120,180,0.10);
+    padding: 2.2rem 2rem 1.5rem 2rem;
+    margin-bottom: 2rem;
+}
+.material-form-label {
+    color: #667eea;
+    font-weight: 500;
+}
+.result-card {
+    background: linear-gradient(120deg, #E0EAFC 0%, #CFDEF3 100%);
+    border-radius: 15px;
+    padding: 1.7rem 1.5rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 1px 6px rgba(102,126,234,0.07);
     text-align: center;
-    }
-
-    .contact-info h4 {
-        color: white;
-        margin-bottom: 0.5rem;
-    }
-    .contact-info hr {
-        border-color: rgba(255, 255, 255, 0.3);
-        margin: 1rem 0;
-    }
-    .github-link,
-    .email-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 300px;
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+.result-ok {
+    color: #00897b;
+}
+.result-bad {
+    color: #d32f2f;
+}
+.footer-tidy {
     text-align: center;
-    padding: 0.6rem 1rem;
-    border-radius: 10px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .github-link {
-    background: rgba(255, 255, 255, 0.2);
-    color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .github-link:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-    }
-
-    .email-link {
-    background: rgba(234, 67, 53, 0.8);
-    color: white !important;
-    border: 1px solid rgba(234, 67, 53, 0.5);
-    }
-
-    .email-link:hover {
-    background: rgba(194, 51, 33, 0.9);
-    transform: translateY(-2px);
-    }
-    .footer {
-        text-align: center;
-        color: var(--text-color);
-        padding: 2rem;
-        border-top: 2px solid rgba(102, 126, 234, 0.3);
-        margin-top: 3rem;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-        border-radius: 15px;
-    }
-    .footer h3 {
-        color: #667eea;
-        margin-bottom: 1rem;
-    }
-    .footer p {
-        color: var(--text-color);
-        opacity: 0.8;
-    }
-    .parameter-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    @media (prefers-color-scheme: dark) {
-        .footer {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-top: 2px solid rgba(102, 126, 234, 0.4);
-        }
-        .info-card {
-            background: rgba(102, 126, 234, 0.1);
-            border-left: 4px solid #667eea;
-            color: var(--text-color);
-        }
-    }
+    margin-top: 2.5rem;
+    color: #8a98a6;
+    font-size: 0.98rem;
+}
+a.footer-link { color: #667eea; text-decoration: none; }
+a.footer-link:hover { text-decoration: underline; }
+hr { border-color: #e0e4ea; }
 </style>
 """, unsafe_allow_html=True)
 
-# Loading saved model
+# --- Model Loader ---
 @st.cache_resource
 def load_model():
     return pickle.load(open('Projects/trained_model.sav', 'rb'))
 
 loaded_model = load_model()
 
-# Creating a function for prediction
+# --- Prediction Function ---
 def diabetes_prediction(input_data):
     try:
-        # Convert input to float and handle empty strings
         input_data_float = []
         for val in input_data:
             if val == '' or val is None:
-                return "❌ Please fill in all fields with valid numbers."
+                return None, "❌ Please fill in all fields with valid numbers."
             input_data_float.append(float(val))
-        
-        # changing the input_data to numpy array
         input_data_as_numpy_array = np.asarray(input_data_float)
-
-        # reshape the array as we are predicting for one instance
-        input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
-
+        input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
         prediction = loaded_model.predict(input_data_reshaped)
-        
-        if (prediction[0] == 0):
-            return '🩺 Based on the analysis, the person is not diabetic.'
+        if prediction[0] == 0:
+            return 0, '🩺 You are NOT diabetic based on the analysis.'
         else:
-            return '⚠️ Warning! The person shows HIGH RISK for diabetes'
+            return 1, '⚠️ HIGH RISK: Likely diabetic, please consult a doctor.'
     except ValueError:
-        return "❌ Please enter valid numeric values for all fields."
+        return None, "❌ Please enter valid numeric values for all fields."
     except Exception as e:
-        return f"❌ An error occurred: {str(e)}"
-    
+        return None, f"❌ An error occurred: {str(e)}"
+
+# --- Main UI ---
 def main():
-    # Header Section
-    st.markdown('<h1 class="main-header">🩺 Diabetes Risk Predictor</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Advanced ML-Powered Health Assessment Tool</p>', unsafe_allow_html=True)
-    
-    # Sidebar Information
-    with st.sidebar:
-        st.markdown("### 📊 About This Application")
-        st.info("""
-        🤖 **Machine Learning Model**: Support Vector Machine (SVM)
-        
-        📈 **Dataset**: Pima Indians Diabetes Database
-        
-        🎯 **Accuracy**: High-precision classification
-        
-        ⚡ **Real-time**: Instant risk assessment
+    st.markdown("<h2 style='text-align: left; margin-bottom: 0;'>Diabetes Risk Assessment</h2>", unsafe_allow_html=True)
+    st.markdown("<span style='color:#666;font-size:1.12rem'>A modern, ML-powered diabetes screening tool</span>", unsafe_allow_html=True)
+    st.write("")
+
+    # --- Layout ---
+    sidebar, maincol, _ = st.columns([1,2.2,0.25])
+
+    # --- Sidebar: About, Info, Guidelines ---
+    with sidebar:
+        st.markdown('<div class="material-card">', unsafe_allow_html=True)
+        st.markdown("#### ℹ️ About")
+        st.write("""
+- **Model:** SVM (Support Vector Machine)
+- **Dataset:** Pima Indians Diabetes
+- **Real-time:** Instant ML prediction
         """)
-        
-        st.markdown("### 📋 Input Parameter Guidelines")
-        st.markdown("""
-        - **Pregnancies**: 0-20 (number of times)
-        - **Glucose**: 0-200 mg/dL
-        - **Blood Pressure**: 0-200 mmHg  
-        - **Skin Thickness**: 0-100 mm
-        - **Insulin**: 0-500 μU/mL
-        - **BMI**: 10.0-67.0 kg/m²
-        - **Pedigree Function**: 0.078-2.420
-        - **Age**: 1-120 years
-        """)
-        
-        st.markdown("### 🏥 Health Disclaimer")
-        st.warning("""
-        ⚠️ This tool is for educational and screening purposes only. 
-        
-        Always consult healthcare professionals for medical advice.
-        """)
-    
-    # Main Content Area
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
-        pass
-    
-    # Input Form in Two Columns
-    st.markdown("### 🔍 Health Parameter Input")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("#### 🏥 Medical History")
-        Pregnancies = st.number_input(
-            "👶 Number of Pregnancies", 
-            min_value=0, max_value=20, value=None, step=1,
-            help="Total number of pregnancies",
-            placeholder="Enter number of pregnancies"
-        )
-        
-        Glucose = st.number_input(
-            "🍬 Glucose Level (mg/dL)", 
-            min_value=0, max_value=300, value=None, step=1,
-            help="Plasma glucose concentration (Normal: 70-100 mg/dL)",
-            placeholder="Enter glucose level"
-        )
-        
-        BloodPressure = st.number_input(
-            "💓 Blood Pressure (mmHg)", 
-            min_value=0, max_value=200, value=None, step=1,
-            help="Diastolic blood pressure (Normal: 60-80 mmHg)",
-            placeholder="Enter blood pressure"
-        )
-        
-        SkinThickness = st.number_input(
-            "📏 Skin Thickness (mm)", 
-            min_value=0, max_value=100, value=None, step=1,
-            help="Triceps skin fold thickness",
-            placeholder="Enter skin thickness"
-        )
-    
-    with col2:
-        st.markdown("#### 🔬 Metabolic Markers")
-        Insulin = st.number_input(
-            "💉 Insulin Level (μU/mL)", 
-            min_value=0, max_value=900, value=None, step=1,
-            help="2-Hour serum insulin (Normal: 16-166 μU/mL)",
-            placeholder="Enter insulin level"
-        )
-        
-        BMI = st.number_input(
-            "⚖️ BMI (kg/m²)", 
-            min_value=10.0, max_value=70.0, value=None, step=0.1,
-            help="Body Mass Index (Normal: 18.5-24.9)",
-            placeholder="Enter BMI value"
-        )
-        
-        DiabetesPedigreeFunction = st.number_input(
-            "🧬 Diabetes Pedigree Function", 
-            min_value=0.0, max_value=3.0, value=None, step=0.001, format="%.3f",
-            help="Genetic diabetes likelihood score",
-            placeholder="Enter pedigree function value"
-        )
-        
-        Age = st.number_input(
-            "👤 Age (years)", 
-            min_value=1, max_value=120, value=None, step=1,
-            help="Age in years",
-            placeholder="Enter age"
-        )
-    
-    # Prediction Button
-    st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        predict_button = st.button("🔮 Get Your Diabetes Report", use_container_width=True)
-    
-    # Prediction Logic
-    if predict_button:
-        input_data = [Pregnancies, Glucose, BloodPressure, SkinThickness, 
-                     Insulin, BMI, DiabetesPedigreeFunction, Age]
-        
-        with st.spinner('🔄 Analyzing your health parameters...'):
-            diagnosis = diabetes_prediction(input_data)
-            
-            if "not diabetic" in diagnosis:
-                st.markdown(f"""
-                <div class="prediction-box negative">
-                    {diagnosis}
-                    <br><small>Keep maintaining your healthy lifestyle! 🌟</small>
-                </div>
-                """, unsafe_allow_html=True)
-                st.balloons()
-                
-                # Health Tips for Non-Diabetic
-                st.markdown("### 💚 Maintain Your Health")
-                st.success("""
-                **Keep up the good work:**
-                - 🥗 Continue balanced nutrition
-                - 🏃‍♂️ Regular physical activity  
-                - 💧 Stay hydrated
-                - 😴 Get adequate sleep
-                - 🔄 Regular health check-ups
-                """)
-                
-            elif "HIGH RISK" in diagnosis:
-                st.markdown(f"""
-                <div class="prediction-box positive">
-                    {diagnosis}
-                    <br><small>Please consult a healthcare professional immediately! 🏥</small>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Health Recommendations for High Risk
-                st.markdown("### 🚨 Immediate Action Required")
-                st.error("""
-                **Important Steps to Take:**
-                - 🏥 **Consult an endocrinologist or your doctor immediately**
-                - 📋 Get comprehensive diabetes testing (HbA1c, fasting glucose)
-                - 🥗 Start dietary modifications
-                - 🏃‍♂️ Begin regular exercise routine
-                - 📱 Monitor blood glucose levels regularly
-                - 💊 Follow all medical recommendations
-                """)
-                
-                st.markdown("### 📞 Emergency Contacts")
-                st.info("""
-                If you experience symptoms like excessive thirst, frequent urination, 
-                blurred vision, or fatigue, seek immediate medical attention.
-                """)
-            
+        st.markdown("**Parameter Ranges**")
+        st.caption("Pregnancies: 0–20\nGlucose: 0–200\nBP: 0–200\nSkin: 0–100\nInsulin: 0–500\nBMI: 10–67\nPedigree: 0.078–2.42\nAge: 1–120")
+        st.warning("⚠️ Educational use only. Not a substitute for medical advice.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Main Content: Form and Result ---
+    with maincol:
+        st.markdown('<div class="material-card">', unsafe_allow_html=True)
+        st.markdown("#### Enter Your Health Data")
+
+        with st.form("diabetes_form"):
+            c1, c2 = st.columns(2)
+            with c1:
+                Pregnancies = st.number_input("Pregnancies", min_value=0, max_value=20, value=None, step=1, help="Number of times pregnant")
+                Glucose = st.number_input("Glucose (mg/dL)", min_value=0, max_value=200, value=None, step=1)
+                BloodPressure = st.number_input("Blood Pressure (mmHg)", min_value=0, max_value=200, value=None, step=1)
+                SkinThickness = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=None, step=1)
+            with c2:
+                Insulin = st.number_input("Insulin (μU/mL)", min_value=0, max_value=500, value=None, step=1)
+                BMI = st.number_input("BMI (kg/m²)", min_value=10.0, max_value=67.0, value=None, step=0.1, format="%.1f")
+                DiabetesPedigreeFunction = st.number_input("Pedigree Function", min_value=0.078, max_value=2.42, value=None, step=0.001, format="%.3f")
+                Age = st.number_input("Age (years)", min_value=1, max_value=120, value=None, step=1)
+            submit = st.form_submit_button("Assess Risk", use_container_width=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # --- Prediction Output ---
+        if submit:
+            input_data = [Pregnancies, Glucose, BloodPressure, SkinThickness,
+                          Insulin, BMI, DiabetesPedigreeFunction, Age]
+            with st.spinner("Analyzing your data..."):
+                result, message = diabetes_prediction(input_data)
+            st.markdown('<div class="result-card {}">'.format('result-bad' if result == 1 else 'result-ok' if result == 0 else ''),
+                        unsafe_allow_html=True)
+            if result == 0:
+                st.markdown(f"<span style='font-size:2rem'>✅</span><br>{message}", unsafe_allow_html=True)
+                st.info("Tips: Keep up with healthy eating, regular exercise, and annual checkups.")
+            elif result == 1:
+                st.markdown(f"<span style='font-size:2rem'>🚨</span><br>{message}", unsafe_allow_html=True)
+                st.error("Please seek medical consultation and follow up with lab tests.")
             else:
-                st.error(diagnosis)
-    
-    # Footer with Contact Information
-    st.markdown("""
-    <div class="footer">
-        <h3>👨‍💻 Developed by</h3>
-        <div class="contact-info">
-            <h4>Sameer Prajapati</h4>
-            <hr>
-            <a href="https://github.com/Sameer-0904" target="_blank" class="github-link">
-                🔗 GitHub: @Sameer-0904
-            </a>
-            <a href="mailto:sameerprajapati0904@gmail.com" class="email-link">
-                📧 sameerprajapati0904@gmail.com
-            </a>
+                st.markdown(message, unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- Minimalist Footer ---
+    st.markdown(
+        """<hr>
+        <div class="footer-tidy">
+            Developed by <a class="footer-link" href="https://github.com/Sameer-0904" target="_blank">Sameer Prajapati</a>
+            &nbsp;|&nbsp; 
+            <a class="footer-link" href="mailto:sameerprajapati0904@gmail.com">Contact</a>
+            <br>
+            <span style="font-size:0.92rem">This tool does not provide medical advice. &copy; 2025</span>
         </div>
-        <hr>
-        <p><em>⚠️ Medical Disclaimer: This application is for educational and screening purposes only. 
-        Always consult qualified healthcare professionals for medical diagnosis and treatment.</em></p>
-        <p><small>© 2025 Sameer Prajapati | Built with ❤️ using Streamlit & Python</small></p>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True
+    )
 
 if __name__ == "__main__":
     main()
