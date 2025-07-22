@@ -134,9 +134,9 @@ def main():
             with st.spinner("⏳ Analyzing your data..."):
                 result, message = diabetes_prediction(input_data)
 
-            st.markdown('<div class="result-card {}">'.format(
-                'result-bad' if result == 1 else 'result-ok' if result == 0 else ''),
-                unsafe_allow_html=True)
+            # st.markdown('<div class="result-card {}">'.format(
+            #     'result-bad' if result == 1 else 'result-ok' if result == 0 else ''),
+            #     unsafe_allow_html=True)
 
             if result == 0:
                 st.markdown(f"""
