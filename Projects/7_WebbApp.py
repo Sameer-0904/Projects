@@ -6,13 +6,13 @@ warnings.filterwarnings('ignore')
 
 # --- General Config ---
 st.set_page_config(
-    page_title="Diabetes Risk Assessment",
-    page_icon="🩺",
+    page_title="Diabetes Risk Assessment 🩺",
+    page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- Custom CSS for Material Design Inspired Look ---
+# --- Custom CSS ---
 st.markdown("""
 <style>
 body { background: #f5f7fa !important; }
@@ -75,9 +75,9 @@ def diabetes_prediction(input_data):
         input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
         prediction = loaded_model.predict(input_data_reshaped)
         if prediction[0] == 0:
-            return 0, '🩺 You are NOT diabetic based on the analysis.'
+            return 0, '✅🩺 You are NOT diabetic based on the analysis.'
         else:
-            return 1, '⚠️ HIGH RISK: Likely diabetic, please consult a doctor.'
+            return 1, '🚨⚠️ HIGH RISK: Likely diabetic, please consult a doctor.'
     except ValueError:
         return None, "❌ Please enter valid numeric values for all fields."
     except Exception as e:
@@ -85,75 +85,99 @@ def diabetes_prediction(input_data):
 
 # --- Main UI ---
 def main():
-    st.markdown("<h2 style='text-align: left; margin-bottom: 0;'>🩺Diabetes Risk Predictor</h2>", unsafe_allow_html=True)
-    st.markdown("<span style='color:#666;font-size:1.12rem'>A modern, ML-powered diabetes screening tool</span>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: left; margin-bottom: 0;'>🩺 Diabetes Risk Predictor</h2>", unsafe_allow_html=True)
+    st.markdown("<span style='color:#666;font-size:1.12rem'>A modern, ML-powered diabetes screening tool ⚙️📊</span>", unsafe_allow_html=True)
     st.write("")
 
     # --- Layout ---
-    sidebar, maincol, _ = st.columns([1,2.2,0.25])
+    sidebar, maincol, _ = st.columns([1, 2.2, 0.25])
 
-    # --- Sidebar: About, Info, Guidelines ---
+    # --- Sidebar ---
     with sidebar:
         st.markdown('<div class="material-card">', unsafe_allow_html=True)
         st.markdown("#### ℹ️ About")
         st.write("""
-- **Model:** SVM (Support Vector Machine)
-- **Dataset:** Pima Indians Diabetes
-- **Real-time:** Instant ML prediction
+- 🤖 **Model:** SVM (Support Vector Machine)  
+- 📚 **Dataset:** Pima Indians Diabetes  
+- ⚡ **Real-time:** Instant ML prediction  
         """)
-        st.markdown("**Parameter Ranges**")
-        st.caption("Pregnancies: 0–20\nGlucose: 0–200\nBP: 0–200\nSkin: 0–100\nInsulin: 0–500\nBMI: 10–67\nPedigree: 0.078–2.42\nAge: 1–120")
+        st.markdown("**📏 Parameter Ranges**")
+        st.caption("🍼 Pregnancies: 0–20\n🍬 Glucose: 0–200\n💓 BP: 0–200\n🧈 Skin: 0–100\n💉 Insulin: 0–500\n⚖️ BMI: 10–67\n🧬 Pedigree: 0.078–2.42\n🎂 Age: 1–120")
         st.warning("⚠️ Educational use only. Not a substitute for medical advice.")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Main Content: Form and Result ---
+    # --- Main Content ---
     with maincol:
         st.markdown('<div class="material-card">', unsafe_allow_html=True)
-        st.markdown("#### Enter Your Health Data")
+        st.markdown("#### 📝 Enter Your Health Data")
 
         with st.form("diabetes_form"):
             c1, c2 = st.columns(2)
             with c1:
-                Pregnancies = st.number_input("Pregnancies", min_value=0, max_value=20, value=None, step=1, help="Number of times pregnant")
-                Glucose = st.number_input("Glucose (mg/dL)", min_value=0, max_value=200, value=None, step=1)
-                BloodPressure = st.number_input("Blood Pressure (mmHg)", min_value=0, max_value=200, value=None, step=1)
-                SkinThickness = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=None, step=1)
+                Pregnancies = st.number_input("🍼 Pregnancies", min_value=0, max_value=20, value=None, step=1, help="Number of times pregnant")
+                Glucose = st.number_input("🍬 Glucose (mg/dL)", min_value=0, max_value=200, value=None, step=1)
+                BloodPressure = st.number_input("💓 Blood Pressure (mmHg)", min_value=0, max_value=200, value=None, step=1)
+                SkinThickness = st.number_input("🧈 Skin Thickness (mm)", min_value=0, max_value=100, value=None, step=1)
             with c2:
-                Insulin = st.number_input("Insulin (μU/mL)", min_value=0, max_value=500, value=None, step=1)
-                BMI = st.number_input("BMI (kg/m²)", min_value=10.0, max_value=67.0, value=None, step=0.1, format="%.1f")
-                DiabetesPedigreeFunction = st.number_input("Pedigree Function", min_value=0.078, max_value=2.42, value=None, step=0.001, format="%.3f")
-                Age = st.number_input("Age (years)", min_value=1, max_value=120, value=None, step=1)
-            submit = st.form_submit_button("Assess Risk", use_container_width=True)
+                Insulin = st.number_input("💉 Insulin (μU/mL)", min_value=0, max_value=500, value=None, step=1)
+                BMI = st.number_input("⚖️ BMI (kg/m²)", min_value=10.0, max_value=67.0, value=None, step=0.1, format="%.1f")
+                DiabetesPedigreeFunction = st.number_input("🧬 Pedigree Function", min_value=0.078, max_value=2.42, value=None, step=0.001, format="%.3f")
+                Age = st.number_input("🎂 Age (years)", min_value=1, max_value=120, value=None, step=1)
+            submit = st.form_submit_button("🔍 Assess Risk", use_container_width=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # --- Prediction Output ---
+        # --- Output Result ---
         if submit:
             input_data = [Pregnancies, Glucose, BloodPressure, SkinThickness,
                           Insulin, BMI, DiabetesPedigreeFunction, Age]
-            with st.spinner("Analyzing your data..."):
+            with st.spinner("⏳ Analyzing your data..."):
                 result, message = diabetes_prediction(input_data)
-            st.markdown('<div class="result-card {}">'.format('result-bad' if result == 1 else 'result-ok' if result == 0 else ''),
-                        unsafe_allow_html=True)
+
+            st.markdown('<div class="result-card {}">'.format(
+                'result-bad' if result == 1 else 'result-ok' if result == 0 else ''),
+                unsafe_allow_html=True)
+
             if result == 0:
-                st.markdown(f"{message}", unsafe_allow_html=True)
-                st.info("Tips: Keep up with healthy eating, regular exercise, and annual checkups.")
+                st.markdown(f"""
+                    <div style="background-color:#E0ECFF; padding: 1rem 1.2rem; border-radius: 12px; font-size: 1.15rem; color:#00695c;">
+                        {message}
+                    </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"""
+                    <div style="background-color:#E6F0FB; padding: 0.8rem 1.1rem; border-radius: 10px; margin-top: 0.8rem; color:#0a53be;">
+                        💡 <strong>Tips:</strong> Keep up with 🥗 healthy eating, 🏃 regular exercise, and 🩺 annual checkups.
+                    </div>
+                """, unsafe_allow_html=True)
+
             elif result == 1:
-                st.markdown(f"<span style='font-size:2rem'>🚨</span><br>{message}", unsafe_allow_html=True)
-                st.error("Please seek medical consultation and follow up with lab tests.")
+                st.markdown(f"""
+                    <div style="background-color:#FFEBEE; padding: 1rem 1.2rem; border-radius: 12px; font-size: 1.15rem; color:#b71c1c;">
+                        {message}
+                    </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"""
+                    <div style="background-color:#FDECEA; padding: 0.8rem 1.1rem; border-radius: 10px; margin-top: 0.8rem; color:#d32f2f;">
+                        🧑‍⚕️ <strong>Important:</strong> Please consult a doctor and follow up with 🧪 lab tests.
+                    </div>
+                """, unsafe_allow_html=True)
+
             else:
-                st.markdown(message, unsafe_allow_html=True)
+                st.markdown(f"❌ {message}", unsafe_allow_html=True)
+
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Minimalist Footer ---
+    # --- Footer ---
     st.markdown(
         """<hr>
         <div class="footer-tidy">
-            Developed by <a class="footer-link" href="https://github.com/Sameer-0904" target="_blank">Sameer Prajapati</a>
+            🔧 Developed by <a class="footer-link" href="https://github.com/Sameer-0904" target="_blank">Sameer Prajapati</a>
             &nbsp;|&nbsp; 
-            <a class="footer-link" href="mailto:sameerprajapati0904@gmail.com">Contact</a>
+            📬 <a class="footer-link" href="mailto:sameerprajapati0904@gmail.com">Contact</a>
             <br>
-            <span style="font-size:0.92rem">This tool does not provide medical advice. &copy; 2025</span>
+            <span style="font-size:0.92rem">🛑 This tool does not provide medical advice. &copy; 2025 Sameer Prajapati</span>
         </div>
         """, unsafe_allow_html=True
     )
