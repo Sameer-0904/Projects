@@ -181,7 +181,7 @@ st.markdown("""
 # Loading saved model
 @st.cache_resource
 def load_model():
-    return pickle.load(open('trained_model.sav', 'rb'))
+    return pickle.load(open('Projects/trained_model.sav', 'rb'))
 
 loaded_model = load_model()
 
