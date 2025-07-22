@@ -123,7 +123,7 @@ def main():
                 BMI = st.number_input("⚖️ BMI (kg/m²)", min_value=10.0, max_value=67.0, value=None, step=0.1, format="%.1f")
                 DiabetesPedigreeFunction = st.number_input("🧬 Pedigree Function", min_value=0.078, max_value=2.42, value=None, step=0.001, format="%.3f")
                 Age = st.number_input("🎂 Age (years)", min_value=1, max_value=120, value=None, step=1)
-            submit = st.form_submit_button("🔍 Assess Risk", use_container_width=True)
+            submit = st.form_submit_button("🔍 Get Your Report", use_container_width=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
