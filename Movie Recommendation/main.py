@@ -5,7 +5,7 @@ from recommend import df, recommend_movies
 from omdb_utils import get_movie_details
 
 
-config = json.load(open("C:\\Users\\HP\\OneDrive\\Desktop\\Scikit-learn\\config.json"))
+config = json.load(open("config.json"))
 
 # OMDB api key
 OMDB_API_KEY = config["OMDB_API_KEY"]
