@@ -1,8 +1,8 @@
-# recommend.py
 import joblib
 import logging
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='[%(asctime)s] %(levelname)s - %(message)s',
@@ -12,15 +12,18 @@ logging.basicConfig(
     ]
 )
 
-logging.info("🔁 Loading data...")
+logging.info("🔁 Loading cleaned DataFrame...")
 try:
     df = joblib.load('df_cleaned.pkl')
-    cosine_sim = joblib.load('cosine_sim.pkl')
-    logging.info("✅ Data loaded successfully.")
 except Exception as e:
-    logging.error("❌ Failed to load required files: %s", str(e))
+    logging.error("❌ Failed to load df_cleaned.pkl: %s", str(e))
     raise e
 
+logging.info("🔠 Recomputing TF-IDF and cosine similarity...")
+tfidf = TfidfVectorizer(max_features=5000)
+tfidf_matrix = tfidf.fit_transform(df['cleaned_text'])
+cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+logging.info("✅ Cosine similarity computed.")
 
 def recommend_movies(movie_name, top_n=5):
     logging.info("🎬 Recommending movies for: '%s'", movie_name)
@@ -32,10 +35,7 @@ def recommend_movies(movie_name, top_n=5):
     sim_scores = list(enumerate(cosine_sim[idx]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:top_n + 1]
     movie_indices = [i[0] for i in sim_scores]
-    logging.info("✅ Top %d recommendations ready.", top_n)
-    # Create DataFrame with clean serial numbers starting from 1
     result_df = df[['title']].iloc[movie_indices].reset_index(drop=True)
-    result_df.index = result_df.index + 1  # Start from 1 instead of 0
+    result_df.index = result_df.index + 1
     result_df.index.name = "S.No."
-
     return result_df
