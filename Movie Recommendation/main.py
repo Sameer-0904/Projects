@@ -5,10 +5,7 @@ from recommend import df, recommend_movies
 from omdb_utils import get_movie_details
 
 
-config = json.load(open("config.json"))
-
-# OMDB api key
-OMDB_API_KEY = config["OMDB_API_KEY"]
+OMDB_API_KEY = ""
 
 st.set_page_config(
     page_title="Movie Recommender",
