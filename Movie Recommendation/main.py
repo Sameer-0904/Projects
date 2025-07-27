@@ -5,7 +5,7 @@ from recommend import df, recommend_movies
 from omdb_utils import get_movie_details
 
 
-OMDB_API_KEY = ""
+OMDB_API_KEY = "fc1a4afa"
 
 st.set_page_config(
     page_title="Movie Recommender",
