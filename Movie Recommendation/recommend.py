@@ -37,7 +37,7 @@ try:
     # Download large file from Hugging Face if missing
     cosine_path = os.path.join(BASE_DIR, 'cosine_sim.pkl')
     download_file(
-        "https://huggingface.co/datasets/Sameer0904/movie-recommendation/blob/main/cosine_sim.pkl"
+        "https://huggingface.co/datasets/Sameer0904/movie-recommendation/blob/main/cosine_sim.pkl",
         cosine_path
     )
     cosine_sim = joblib.load(cosine_path)
@@ -66,3 +66,4 @@ def recommend_movies(movie_name, top_n=5):
     result_df.index.name = "S.No."
 
     return result_df
+
