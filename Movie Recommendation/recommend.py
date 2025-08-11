@@ -3,10 +3,6 @@ import logging
 import os
 import requests
 
-# Google Drive file URLs (direct download)
-DF_URL = "https://drive.google.com/uc?export=download&id=15qvUpi_ZoHHMX1dEVhXq4jqegjFFvyGm"
-COSINE_URL = "https://drive.google.com/uc?export=download&id=14rs3W0tlucexSnDkn24KT3udXVq2B71Q"
-
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
