@@ -6,7 +6,7 @@ warnings.filterwarnings('ignore')
 
 # --- General Config ---
 st.set_page_config(
-    page_title="Diabetes Risk Assessment 🩺",
+    page_title="Diabetes Risk Assessment 🩺 - by Sameer Prajapati",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
